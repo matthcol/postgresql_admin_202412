@@ -1,5 +1,5 @@
 -- DAY 2 --
-
+-- start in db dbmovie --
 SELECT * FROM pg_collation;
 SELECT * FROM pg_collation where collname like 'fr-FR%';
 
@@ -12,6 +12,8 @@ CREATE DATABASE dbcity
     ICU_LOCALE = 'fr-FR'
     LOCALE_PROVIDER = 'icu'
 ;
+
+-- go to db dbcity --
 
 -- generate key with identity (alt. serial)
 -- proposed by SQL standard (also mssql, oracle, ...)
