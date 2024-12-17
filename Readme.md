@@ -13,5 +13,18 @@ docker exec -it some-postgres bash
 docker logs some-postgres
 ```
 
+### copy host files to container
+```
+docker cp 02-data-persons.sql some-postgres:/tmp
+```
+
 ## PgAdmin 4 (GUI)
 https://www.pgadmin.org/
+
+## psql (CLI)
+### shortcut commands
+\? : help
+\d : list of relations (table, view, sequence)
+\l : list of databases
+\q : quit
+\i script.sql : execute SQL script
