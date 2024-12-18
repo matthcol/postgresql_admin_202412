@@ -142,6 +142,12 @@ select * from city order by name collate "es-ES-x-icu"; -- Mano, Mañana, Matado
 
 select * from city order by id desc;
 
+-- ********************************** --
+-- Schema, user, role, privileges     --
+-- ********************************** --
+-- https://www.postgresql.org/docs/17/sql-grant.html
+
+
 -- schema
 select * from city;
 select * from public.city;
@@ -236,17 +242,76 @@ update city set zipcode = '31000' where id = 8; -- OK
 update city set name = 'TOULOUSE' where id = 8; -- KO: ERROR:  permission denied for table city 
 delete from city; -- KO: ERROR:  permission denied for table city 
 
+-- session DBA postgres
+-- NB: with PostgreSQL keywords USER and ROLE are equivalent
+create role city_reader;
+grant usage on schema territory to city_reader;
+grant select on territory.city to city_reader;
+
+create role city_manager_l1;
+grant city_reader to city_manager_l1;
+grant insert, update(zipcode) on territory.city to city_manager_l1;
+
+create user user1 
+with 
+	login 
+	password 'password';
+create user user2 
+with 
+	login 
+	password 'password';
+create user user3
+with 
+	login 
+	password 'password';
+
+grant city_reader to user1;
+grant city_reader to user2;
+grant city_manager_l1 to user3;
+
+-- session user1
+set role city_reader;
+select * from territory.city;
+reset role;
+
+-- session user2 with role city_reader
+select * from territory.city;
+
+-- session user3 with role city_manager_l1
+select * from territory.city;
+insert into territory.city (name) values ('Pau');
+delete from territory.city; -- ko: ERROR:  permission denied for table city
+select current_user, session_user; -- "city_manager_l1", "user3"
 
 
+-- session DBA postgres on dbmovie
+create user user4
+with 
+	login 
+	password 'password';
+-- default: grant usage on schema public to user4;
+grant select on all tables in schema public to user4; -- all tables are in the schema public in this database 
+-- NB: does not work for future tables !
 
+-- session user4 on dbmovie
+select * from movie;
+select * from person;
 
+-- default role PUBLIC (everybody has this role)
+-- old versions of postgresql, improve security (default: ALL)
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+-- new versions of postgresql have only USAGE privilege by default
+-- all versions of postgresql, deactivate usage of schema public
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+-- NB: never drop schema public (used by some extensions or plugins)
 
+-- access control --
+-- config files: 
+-- * postgresql.conf : general config file (network interface, logs, wals, ... )
+-- * pg_hba.conf : access control (user, db, client, mode auth)
 
-
-
-
-
-
-
-	
--- indexes --
+-- (TODO)
+-- indexes  --
+-- vacuumm / analyze + filesystem --
+-- statistics --
+-- backup/restore + wals/pitr
