@@ -1,5 +1,5 @@
 .env
-!dbmoviedocker/scripts/.SAVE_YOUR_SCRIPTS_HERE
-dbmoviedocker/scripts/*
-!dbmoviedocker/sqlinit/.INIT_DB_SCRIPTS_HERE
-dbmoviedocker/sqlinit/*
+!.nodata
+# dbmoviedocker/sqlinit/*
+# dbmoviedocker/scripts/*
+# dbmoviedocker/backup/*
